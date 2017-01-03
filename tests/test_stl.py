@@ -1,9 +1,9 @@
 import pytest
-from stl import parse
-from parametrizer import getParams, setParams
-from synth import explore
-from scorer import qualitativescore, quantitativescore
-import inputreader
+from telex.stl import parse
+from telex.parametrizer import getParams, setParams
+from telex.synth import explore
+from telex.scorer import qualitativescore, quantitativescore
+import telex.inputreader as inputreader
 import pandas
 
 #x1 range(1,10)
@@ -46,7 +46,7 @@ def test_stl(tlStr):
     #print(stl)
     print(stl1)
     #x = pandas.DataFrame([[1,2, True], [1,4, True], [4,2, False], [1,2, True], [1,4, True], [4,2, False], [1,2, True], [1,4, True], [4,2, False], [4,2, False]], index=[0,1,2,3,4,5,6,7,8,9], columns=["x1", "x2", "x3"])
-    x = inputreader.readtracefile("trace1.csv")
+    x = inputreader.readtracefile("traces/trace1.csv")
     try:
         boolscore = qualitativescore(stl1, x, 0)
         quantscore = quantitativescore(stl1, x, 0)

@@ -1,4 +1,4 @@
-from stl import *
+from telex.stl import *
 
 def getParams(stl):
     if isinstance(stl, (Globally, Future)):

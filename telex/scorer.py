@@ -4,7 +4,7 @@ if (sys.version_info > (3, 0)):
 else:
     from singledispatch import singledispatch
 
-from stl import *
+from telex.stl import *
 import operator as op
 
 @singledispatch

@@ -1,8 +1,9 @@
-import stl
-import parametrizer
+import telex.stl as stl
+import telex.parametrizer as parametrizer
+import telex.scorer as scorer
 import bayesopt
 import numpy as np
-import scorer
+
 
 from time import clock
 
