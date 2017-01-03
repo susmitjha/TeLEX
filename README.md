@@ -7,7 +7,7 @@ Installation Instructions
 
 1) Prerequisite: Python and python-dev packages (Can use apt-get install on Ubuntu).
 
-2) Python packages: numpy, pandas, parsimonious (Ca use pip install for these).
+2) Python packages: numpy, pandas, parsimonious (Can use pip install for these).
 
 3) Install BayesOpt tool with Python API wrapper.
 

@@ -39,6 +39,7 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
     params['n_iterations'] = iter_learn
     params['n_iter_relearn'] = iter_relearn
     params['n_init_samples'] = init_samples
+    params['verbose_level'] = 5
     prmlist = parametrizer.getParams(stl)
     prmcount = len(prmlist)
     start = clock()
@@ -63,12 +64,12 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
     elif mode == "continuous":
         mvalue, x_out, error = bayesopt.optimize(costfunc, prmcount, lb, ub, params)
         
-    print "Final cost is", mvalue, " at ", x_out
-    print "Synthesis time:", clock() - start, "seconds"
+    #print "Final cost is", mvalue, " at ", x_out
+    #print "Synthesis time:", clock() - start, "seconds"
     prmvalue = {}
     i = 0
     for prm in prmlist:
         prmvalue[prm.name] = x_out[i]
         i = i + 1
     stlfinal = parametrizer.setParams(stl, prmvalue)
-    return stlfinal
+    return (stlfinal, mvalue, clock()-start)

@@ -121,6 +121,7 @@ robusttable = { "<" : lambda x,y: y-x, "<=" : lambda x,y: y-x, ">" : lambda x,y:
 
 @quantitativescore.register(Constraint)
 def _(stl, x, t):
+    #print(stl,  robusttable[stl.relop](getval(stl.term, x, t), getval(stl.bound, x, t)) )
     return robusttable[stl.relop](getval(stl.term, x, t), getval(stl.bound, x, t))
 
 @quantitativescore.register(Atom)
