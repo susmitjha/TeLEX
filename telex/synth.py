@@ -43,6 +43,14 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
     prmcount = len(prmlist)
     start = clock()
     costfunc = lambda paramval : quantscoretracelist(stl,tracelist,paramval)
+    lb = np.zeros((prmcount,))
+    ub = np.ones((prmcount,))
+    i = 0
+    for prm in prmlist:
+        lb[i] = float(prm.left)
+        ub[i] = float(prm.right)
+        i = i +1 
+
     if mode == "discrete":
         steps = steps + 1
         x_set = np.zeros(shape = (prmcount, steps))
@@ -53,13 +61,6 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
         x_set = np.transpose(x_set)
         mvalue, x_out, error = bayesopt.optimize_discrete(costfunc, x_set, params)
     elif mode == "continuous":
-        lb = np.zeros((prmcount,))
-        ub = np.ones((prmcount,))
-        i = 0
-        for prm in prmlist:
-            lb[i] = float(prm.left)
-            ub[i] = float(prm.right)
-            i = i +1 
         mvalue, x_out, error = bayesopt.optimize(costfunc, prmcount, lb, ub, params)
         
     print "Final cost is", mvalue, " at ", x_out
