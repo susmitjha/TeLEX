@@ -11,7 +11,8 @@ setup(name='TeLEX',
       install_requires=[
           'parsimonious',
           'numpy',
-          'pandas'
+          'pandas',
+          'singledispatch'
       ],
       packages=find_packages(),
 )
