@@ -91,12 +91,13 @@ def quantitativescore(stl, x, t):
 @quantitativescore.register(Globally)
 def _(stl, x, t):
     (left, right) = stl.interval
-    return (right - left + 1) * min(quantitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    #(right - left + 1)
+    return  min(quantitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
 
 @quantitativescore.register(Future)
 def _(stl, x, t):
     (left, right) = stl.interval
-    return 1/(right - left + 1) * max(quantitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    return max(quantitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
 
 
 @quantitativescore.register(Or)

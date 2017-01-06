@@ -41,7 +41,7 @@ def test_stl(tlStr):
     '''
     
     #stlsyn = synth.bayesoptimize(stlex, [x,x1], 50, 1, 2, "discrete", steps = 10)
-    stlsyn, value, dur = synth.bayesoptimize(stlex, [x,x1], 50, 1, 2, "continuous")
+    stlsyn, value, dur = synth.bayesoptimize(stlex, [x,x1], 100, 1, 2, "continuous")
     print("Synthesized STL: {}".format(stlsyn))
     print("Synthesis: Cost is {}, Time taken is {}".format(value, dur))
     try:

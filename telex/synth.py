@@ -15,7 +15,7 @@ def explore(paramlist):
     return paramvalue
 
 
-def quantscoretracelist(stl, tracelist, paramvalue):
+def cumscoretracelist(stl, paramvalue, tracelist, scorerfun):
     score = 0;
     paramlist = parametrizer.getParams(stl)
     valmap = {}
@@ -26,13 +26,11 @@ def quantscoretracelist(stl, tracelist, paramvalue):
     stlcand = parametrizer.setParams(stl, valmap)
     for trace in tracelist:
         try:
-            quantscore = scorer.quantitativescore(stlcand, trace, 0)
-            #print(stlcand, trace)
-            #print(quantscore)
+            quantscore = scorerfun(stlcand, trace, 0)
         except ValueError:
             quantscore = -10000
         score = score + quantscore 
-    return -score
+    return score
 
 def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, steps=10):
     params = {}
@@ -41,9 +39,8 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
     params['n_init_samples'] = init_samples
     params['verbose_level'] = 5
     prmlist = parametrizer.getParams(stl)
+
     prmcount = len(prmlist)
-    start = clock()
-    costfunc = lambda paramval : quantscoretracelist(stl,tracelist,paramval)
     lb = np.zeros((prmcount,))
     ub = np.ones((prmcount,))
     i = 0
@@ -51,7 +48,8 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
         lb[i] = float(prm.left)
         ub[i] = float(prm.right)
         i = i +1 
-
+    start = clock()
+    costfunc = lambda paramval : -1*cumscoretracelist(stl,paramval,tracelist,scorer.quantitativescore)
     if mode == "discrete":
         steps = steps + 1
         x_set = np.zeros(shape = (prmcount, steps))
@@ -60,9 +58,15 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
             x_set[i] = np.linspace(lb[i],ub[i],steps)
             i = i + 1
         x_set = np.transpose(x_set)
-        mvalue, x_out, error = bayesopt.optimize_discrete(costfunc, x_set, params)
+        try:
+            mvalue, x_out, error = bayesopt.optimize_discrete(costfunc, x_set, params)
+        except RuntimeError:
+            raise RuntimeError("Template {} could not be completed. Rerun to try again. Bayesian optimization experienced a nondeterministic (nonpersistent) runtime numerical error.".format(stl))
     elif mode == "continuous":
-        mvalue, x_out, error = bayesopt.optimize(costfunc, prmcount, lb, ub, params)
+        try:
+            mvalue, x_out, error = bayesopt.optimize(costfunc, prmcount, lb, ub, params)
+        except RuntimeError:
+            raise RuntimeError("Template {} could not be completed. Rerun to try again. Bayesian optimization experienced a nondeterministic (nonpersistent) runtime numerical error.".format(stl))
         
     #print "Final cost is", mvalue, " at ", x_out
     #print "Synthesis time:", clock() - start, "seconds"
