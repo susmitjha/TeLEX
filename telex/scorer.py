@@ -1,4 +1,7 @@
 import sys
+import math
+from random import randint
+
 if (sys.version_info > (3, 0)):
     from functools import singledispatch
 else:
@@ -48,8 +51,6 @@ def _(stl, x, t):
     return not qualitativescore(stl.subformula, x, t)
 
 optable = { "<" : op.lt, ">" : op.gt, "<=" : op.le, ">=" : op.ge, "==": op.eq, "+" : op.add, "-" : op.sub, "*" : op.mul, "/" : op.truediv }
-
-
  
 @qualitativescore.register(Constraint)
 def _(stl, x, t):
@@ -86,7 +87,7 @@ def _(term, x, t):
 
 @singledispatch
 def quantitativescore(stl, x, t):
-    raise NotImplementedError("No qualitativescore for {} of class {}".format(stl, stl.__class__))
+    raise NotImplementedError("No quantitativescore for {} of class {}".format(stl, stl.__class__))
 
 @quantitativescore.register(Globally)
 def _(stl, x, t):
@@ -131,4 +132,64 @@ def _(stl, x, t):
         return 1
     else:
         return 0
+
+
+
+
+
+@singledispatch
+def smartscore(stl, x, t):
+    raise NotImplementedError("No smartscore for {} of class {}".format(stl, stl.__class__))
+
+@smartscore.register(Globally)
+def _(stl, x, t):
+    (left, right) = stl.interval
+    intervalwidth = right - left + 1
+    return  2/(1 + math.exp(-0.01 * intervalwidth) ) * min(smartscore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+
+@smartscore.register(Future)
+def _(stl, x, t):
+    (left, right) = stl.interval
+    intervalwidth = right - left + 1
+    return  2/(1 + math.exp(0.01 * intervalwidth) ) * max(smartscore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+
+
+@smartscore.register(Or)
+def _(stl, x, t):
+    return max(smartscore(stl.left, x, t), smartscore(stl.right, x, t))
+
+@smartscore.register(And)
+def _(stl, x, t):
+    return min(smartscore(stl.left, x, t), smartscore(stl.right, x, t))
+
+@smartscore.register(Implies)
+def _(stl, x, t):
+    return max( (-1*  smartscore(stl.left, x, t) ), smartscore(stl.right, x, t) )
+
+@smartscore.register(Not)
+def _(stl, x, t):
+    return -1 * smartscore(stl.subformula, x, t)
+
+robusttable = { "<" : lambda x,y: y-x, "<=" : lambda x,y: y-x, ">" : lambda x,y: x-y , ">=": lambda x,y: x-y, "==" : lambda x,y: -abs(x,y) }
+
+@smartscore.register(Constraint)
+def _(stl, x, t):
+    rawscore = robusttable[stl.relop](getval(stl.term, x, t), getval(stl.bound, x, t))
+    
+    #randomscorefun = randint(1,3)
+    #if randomscorefun == 1:
+    #return -0.6+1/(rawscore -1 + math.exp(-rawscore+1))
+    #elif randomscorefun == 2:
+    return 1/(rawscore + math.exp(-1*rawscore)) - math.exp(-1*rawscore) 
+    #else :
+    #    return rawscore*math.exp(1-rawscore)
+
+@smartscore.register(Atom)
+def _(stl, x, t):
+    if x[stl.name][t]:
+        return 1
+    else:
+        return 0
+
+
 
