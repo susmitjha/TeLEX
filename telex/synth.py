@@ -27,7 +27,7 @@ def explore(paramlist):
 
 
 def cumscoretracelist(stl, paramvalue, tracelist, scorerfun):
-    score = 0;
+    score = 0; #-10000; #proxy for -inf, putting -inf makes optimizers angry
     paramlist = parametrizer.getParams(stl)
     valmap = {}
     i = 0
@@ -39,9 +39,23 @@ def cumscoretracelist(stl, paramvalue, tracelist, scorerfun):
         try:
             quantscore = scorerfun(stlcand, trace, 0)
         except ValueError:
-            quantscore = -10000
-        score = score + quantscore 
+            quantscore = -10000 #proxy for -inf, putting -inf makes optimizers angry
+        score = (score + quantscore) 
     return score
+
+
+def minscoretracelist(stl, paramvalue, tracelist, scorerfun):
+    score = 10000; #proxy for inf, putting inf makes optimizers angry
+    paramlist = parametrizer.getParams(stl)
+    stlcand = parametrizer.setParams(stl, paramvalue)
+    for trace in tracelist:
+        try:
+            quantscore = scorerfun(stlcand, trace, 0)
+        except ValueError:
+            quantscore = -10000 #proxy for -inf, putting -inf makes optimizers angry
+        score = min(score, quantscore) 
+    return score
+
 
 
 def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID'):
@@ -87,13 +101,12 @@ def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID'):
 
     mvalue = bestCost
     x_out = bestX
-    prmvalue = {}
     i = 0
+    pvalue = {}
     for prm in prmlist:
-        prmvalue[prm.name] = x_out[i]
+        pvalue[prm.name] = x_out[i]
         i = i + 1
-    stlfinal = parametrizer.setParams(stl, prmvalue)
-    return (stlfinal, mvalue, clock()-start)
+    return (pvalue, mvalue, clock()-start)
 
 
 
@@ -164,15 +177,84 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
         
     #print "Final cost is", mvalue, " at ", x_out
     #print "Synthesis time:", clock() - start, "seconds"
+    return (x_out, mvalue, clock()-start)
+
+
+def pbinsearch(prm, lbound, ubound, costfunc, pvalue_mut, decinc):
+    #pvalue_mut is dictionary and hence, mutable, so create copy before doing anything with it
+    pvalue = pvalue_mut.copy()
+
+    epsilon = 0.01
+    while ubound - lbound >= epsilon:
+        pvalue[prm.name] = (ubound + lbound)/2
+        c = costfunc(pvalue)
+ #       print decinc, ubound, lbound, pvalue[prm.name], c
+        if decinc == "dec":
+            if c >= 0:
+                ubound = pvalue[prm.name]
+            else:
+                lbound = pvalue[prm.name]
+        elif decinc == "inc":
+            if c >= 0:
+                lbound = pvalue[prm.name]
+            else:
+                ubound = pvalue[prm.name]
+        else: 
+            raise ValueError("Roundupdown is incorrect for {}".format(prm.name))
+
+    if decinc == "dec":
+        return ubound 
+    elif decinc == "inc":
+        return lbound
+    else: 
+        raise ValueError("Roundupdown is incorrect for {}".format(prm.name))
+
+    
+
+def postProcess(stlex, pvalue, dirparams, tracelist):
+    prmlist = parametrizer.getParams(stlex)
+    prmcount = len(prmlist)
+    boundlist = []
+    for prm in prmlist:
+        boundlist.append((float(prm.left),float(prm.right)))
+
+    costfunc = lambda pvalue : minscoretracelist(stlex,pvalue,tracelist,scorer.quantitativescore)
+
+    '''
+    # expand to ensure all traces satisfy the stl property
     prmvalue = {}
     i = 0
     for prm in prmlist:
-        prmvalue[prm.name] = x_out[i]
+        #binary search between pvalue[prm.name] and lower/upper from boundlist
+        lbound, ubound = boundlist[i]
         i = i + 1
-    stlfinal = parametrizer.setParams(stl, prmvalue)
-    return (stlfinal, mvalue, clock()-start)
+        if (prm.name,1) in dirparams: #decrease will try to satisfy 
+            prmvalue[prm.name] = strechsearch(prm, lbound, pvalue[prm.name], costfunc, pvalue, "dec")
+        elif (prm.name,-1) in dirparams: #increase will try to satisfy
+            prmvalue[prm.name] = strechsearch(prm, pvalue[prm.name], ubound, costfunc, pvalue, "inc")
+        else:
+            raise ValueError("Can't synthesize equality parameter: {}".format(prm.name))
 
+    '''
+   
+    prmvalue  = pvalue
 
+    # contract till all traces still satisfy the stl property
+    paramvalue = {}
+    i = 0
+    for prm in prmlist:
+        #binary search between pvalue[prm.name] and lower/upper from boundlist
+        lbound, ubound = boundlist[i]
+        i = i + 1
+        if (prm.name,1) in dirparams: #increase till possible 
+            paramvalue[prm.name] = pbinsearch(prm, prmvalue[prm.name], ubound, costfunc, prmvalue, "inc")
+        elif (prm.name,-1) in dirparams: #decrease till possible 
+            paramvalue[prm.name] = pbinsearch(prm, lbound, prmvalue[prm.name], costfunc, prmvalue, "dec")
+        else:
+            raise ValueError("Can't synthesize equality parameter: {}".format(prm.name))
+
+    return paramvalue
+    
 
 
 def synthSTLParam(tlStr, tracedir, optmethod = 'DE'):
@@ -188,7 +270,13 @@ def synthSTLParam(tlStr, tracedir, optmethod = 'DE'):
     #stlsyn = synth.bayesoptimize(stlex, [x,x1], 50, 1, 2, "discrete", steps = 10)
     #stlsyn, value, dur = synth.bayesoptimize(stlex, [x,x1], 100, 1, 2, "continuous")
 
-    stlsyn, value, dur = simoptimize(stlex, tracelist, optmethod = optmethod)
+    pvalue, value, dur = simoptimize(stlex, tracelist, optmethod = optmethod)
+    dirparams = parametrizer.getParamsDir(stlex, 0)
+    #print(dirparams)
+    ppvalue = postProcess(stlex, pvalue, dirparams, tracelist) 
+    #print(pvalue, ppvalue)
+    stlsyn = parametrizer.setParams(stlex, ppvalue)
+
     logging.debug("Synthesized STL: {}".format(stlsyn))
     logging.debug("Synthesis: Cost is {}, Time taken is {}".format(value, dur))
     return stlsyn, value, dur
