@@ -1,5 +1,45 @@
 from telex.stl import *
 
+def getParamsDir(stl, dir):
+    if isinstance(stl, Globally):
+        return list(set().union(getParamsDir(stl.interval, 1), getParamsDir(stl.subformula, 0) ) )
+    elif isinstance(stl, Future):
+        return list(set().union(getParamsDir(stl.interval, -1), getParamsDir(stl.subformula, 0) ) )
+    elif isinstance(stl, Interval):
+        #For intervals
+        #dir 1 means, expand as much as possible
+        #dir -1 means contract as much as possible
+        if dir==1:
+            return list(set().union(getParamsDir(stl.left, -1), getParamsDir(stl.right, 1))) 
+        elif dir == -1:
+            return list(set().union(getParamsDir(stl.left, 1), getParamsDir(stl.right, -1)))      
+        else:
+            raise NotImplementedError
+    elif isinstance(stl, (Or, And, Implies, Expr)):
+        return list(set().union(getParamsDir(stl.left, 0), getParamsDir(stl.right, 0)))
+    elif isinstance(stl,Not):
+        return getParamsDir(stl.subformula, 0)
+    elif isinstance(stl, Constraint):
+        if (stl.relop == "<" or stl.relop == "<="):
+            return list(set().union(getParamsDir(stl.term,0), getParamsDir(stl.bound, -1)))
+        elif (stl.relop == ">" or stl.relop == ">="):
+            return list(set().union(getParamsDir(stl.term,0), getParamsDir(stl.bound, 1)))
+        else:
+            list(set().union(getParamsDir(stl.term,0), getParamsDir(stl.bound, 0)))
+    elif isinstance(stl, (Atom, Var)):
+        return []
+    elif isinstance(stl, Param):
+        #For params
+        #dir 1 means, increase as much as possible
+        #dir -1 means decrease as much as possible
+        return [(stl.name, dir)]
+    elif isinstance(stl, Constant):
+        return []
+    else:
+        return NotImplementedError
+
+
+
 def getParams(stl):
     if isinstance(stl, (Globally, Future)):
         return list(set().union(getParams(stl.interval), getParams(stl.subformula)))
