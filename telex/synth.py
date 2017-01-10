@@ -180,6 +180,33 @@ def bayesoptimize(stl, tracelist, iter_learn, iter_relearn, init_samples, mode, 
     return (x_out, mvalue, clock()-start)
 
 
+def stretchsearch(prm, lbound, ubound, costfunc, pvalue_mut, decinc):
+    #pvalue_mut is dictionary and hence, mutable, so create copy before doing anything with it
+    pvalue = pvalue_mut.copy()
+    
+    c = costfunc(pvalue)
+    if c> 0: 
+        return pvalue[prm.name]
+    epsilon = 0.01
+    while c <= 0 and ubound - lbound > epsilon:
+        pvalue[prm.name] = (ubound + lbound)/2
+        c = costfunc(pvalue)
+        print(c, pvalue)
+        if decinc == "dec":
+            if c >= 0:
+                return pvalue[prm.name]
+            else:
+                ubound = pvalue[prm.name]
+        elif decinc == "inc":
+            if c >= 0:
+                return pvalue[prm.name]
+            else:
+                lbound = pvalue[prm.name]
+        else: 
+            raise ValueError("Strech is incorrect for {}".format(prm.name))
+
+    raise ValueError("No value possible for {}".format(prm.name))
+
 def pbinsearch(prm, lbound, ubound, costfunc, pvalue_mut, decinc):
     #pvalue_mut is dictionary and hence, mutable, so create copy before doing anything with it
     pvalue = pvalue_mut.copy()
@@ -220,7 +247,7 @@ def postProcess(stlex, pvalue, dirparams, tracelist):
 
     costfunc = lambda pvalue : minscoretracelist(stlex,pvalue,tracelist,scorer.quantitativescore)
 
-    '''
+    
     # expand to ensure all traces satisfy the stl property
     prmvalue = {}
     i = 0
@@ -229,15 +256,15 @@ def postProcess(stlex, pvalue, dirparams, tracelist):
         lbound, ubound = boundlist[i]
         i = i + 1
         if (prm.name,1) in dirparams: #decrease will try to satisfy 
-            prmvalue[prm.name] = strechsearch(prm, lbound, pvalue[prm.name], costfunc, pvalue, "dec")
+            prmvalue[prm.name] = stretchsearch(prm, lbound, pvalue[prm.name], costfunc, pvalue, "dec")
         elif (prm.name,-1) in dirparams: #increase will try to satisfy
-            prmvalue[prm.name] = strechsearch(prm, pvalue[prm.name], ubound, costfunc, pvalue, "inc")
+            prmvalue[prm.name] = stretchsearch(prm, pvalue[prm.name], ubound, costfunc, pvalue, "inc")
         else:
             raise ValueError("Can't synthesize equality parameter: {}".format(prm.name))
 
-    '''
+    
    
-    prmvalue  = pvalue
+    #prmvalue  = pvalue
 
     # contract till all traces still satisfy the stl property
     paramvalue = {}
@@ -251,7 +278,7 @@ def postProcess(stlex, pvalue, dirparams, tracelist):
         elif (prm.name,-1) in dirparams: #decrease till possible 
             paramvalue[prm.name] = pbinsearch(prm, lbound, prmvalue[prm.name], costfunc, prmvalue, "dec")
         else:
-            raise ValueError("Can't synthesize equality parameter: {}".format(prm.name))
+            paramvalue[prm.name] = prmvalue[prm.name]
 
     return paramvalue
     
