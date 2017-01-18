@@ -25,8 +25,11 @@ This will create an environment named "telex" in your conda. Verify this by runn
 
 You should see a list of environments with "telex" in it; illustrative example:
 >\# conda environments:
+
 >\#
+
 >telex                    /home/jha/anaconda2/envs/telex
+
 >root                  *  /home/jha/anaconda2
 
 3) If the "telex" environment is present in your environment, you can activate it by:
@@ -36,6 +39,7 @@ You should see a list of environments with "telex" in it; illustrative example:
 >(telex) jha@sjlinux1:~/projects/TeLEX$ export PYTHONPATH=$PWD
 
 >(telex) jha@sjlinux1:~/projects/TeLEX$ echo $PYTHONPATH
+
 >/home/jha/projects/TeLEX
 
 4) Go to tests folder and run "python test_learn.py" to check if all tests pass and TeLEX is installed.
