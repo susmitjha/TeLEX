@@ -19,8 +19,10 @@ http://conda.pydata.org/docs/install/full.html
 
 2) Use the yml file in repository to setup environment for TeLEX
 > conda env create -f telex.yml
+
 This will create an environment named "telex" in your conda. Verify this by running: 
 > conda env list
+
 You should see a list of environments with "telex" in it; illustrative example:
 >\# conda environments:
 >\#
