@@ -32,7 +32,7 @@ You should see a list of environments with "telex" in it; illustrative example:
 
 >root                  *  /home/jha/anaconda2
 
-3) If the "telex" environment is present in your environment, you can activate it by:
+3) Once the "telex" environment is present in your environment, you can activate it by:
 > source activate telex
 
 4) Add TeLEX home to your PYTHONPATH environment variable; illustrative example:
@@ -43,6 +43,9 @@ You should see a list of environments with "telex" in it; illustrative example:
 >/home/jha/projects/TeLEX
 
 4) Go to tests folder and run "python test_learn.py" to check if all tests pass and TeLEX is installed.
+>(telex) jha@sjlinux1:~/projects/TeLEX$ cd tests/
+
+>(telex) jha@sjlinux1:~/projects/TeLEX/tests$ python test_learn.py 
 
 -----------------------------------------
 2. Virtualbox
