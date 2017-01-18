@@ -2,10 +2,14 @@
 # TeLEX
 Temporal Logic Extractor
 
-
+==========================
 Installation Instructions 
+==========================
+
 1. Conda (Recommended)
+
 2. Virtualbox 
+
 3. Plain old simple method
 
 -----------------------------------------
