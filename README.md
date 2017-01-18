@@ -22,8 +22,8 @@ http://conda.pydata.org/docs/install/full.html
 This will create an environment named "telex" in your conda. Verify this by running: 
 > conda env list
 You should see a list of environments with "telex" in it; illustrative example:
-># conda environments:
->#
+>\# conda environments:
+>\#
 >telex                    /home/jha/anaconda2/envs/telex
 >root                  *  /home/jha/anaconda2
 
@@ -32,6 +32,7 @@ You should see a list of environments with "telex" in it; illustrative example:
 
 4) Add TeLEX home to your PYTHONPATH environment variable; illustrative example:
 >(telex) jha@sjlinux1:~/projects/TeLEX$ export PYTHONPATH=$PWD
+
 >(telex) jha@sjlinux1:~/projects/TeLEX$ echo $PYTHONPATH
 >/home/jha/projects/TeLEX
 
