@@ -51,6 +51,10 @@ You should see a list of environments with "telex" in it; illustrative example:
 
 >(telex) jha@sjlinux1:~/projects/TeLEX/tests$ python test_learn.py 
 
+or run it as a pytest script, if you have pytest 
+
+> (telex) jha@sjlinux1:~/projects/TeLEX/tests$ pytest test_learn.py 
+
 -----------------------------------------
 2. Virtualbox
 -----------------------------------------

@@ -21,5 +21,11 @@ def test_stl(tlStr):
     (bres, qres) = telex.synth.verifySTL(stlsyn, "traces")
     print(bres, qres)
 
-for templ in templogicdata:
-    test_stl(templ)
+
+def main():
+    for templ in templogicdata:
+        test_stl(templ)
+
+if __name__ == "__main__":
+    main()
+
