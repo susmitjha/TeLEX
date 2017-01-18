@@ -3,8 +3,14 @@
 Temporal Logic Extractor
 
 
-Recommended Installation Instructions
---------------------------------------
+Installation Instructions 
+1. Conda (Recommended)
+2. Virtualbox 
+3. Plain old simple method
+
+-----------------------------------------
+1. Conda
+-----------------------------------------
 
 1) Get hold of Conda: 
 https://www.continuum.io/downloads#linux
@@ -13,14 +19,32 @@ http://conda.pydata.org/docs/install/full.html
 
 2) Use the yml file in repository to setup environment for TeLEX
 > conda env create -f telex.yml
+This will create an environment named "telex" in your conda. Verify this by running: 
+> conda env list
+You should see a list of environments with "telex" in it; illustrative example:
+># conda environments:
+>#
+>telex                    /home/jha/anaconda2/envs/telex
+>root                  *  /home/jha/anaconda2
 
-3) Add TeLEX home to PYTHONPATH
+3) If the "telex" environment is present in your environment, you can activate it by:
+> source activate telex
+
+4) Add TeLEX home to your PYTHONPATH environment variable; illustrative example:
+>(telex) jha@sjlinux1:~/projects/TeLEX$ export PYTHONPATH=$PWD
+>(telex) jha@sjlinux1:~/projects/TeLEX$ echo $PYTHONPATH
+>/home/jha/projects/TeLEX
 
 4) Go to tests folder and run "python test_learn.py" to check if all tests pass and TeLEX is installed.
 
+-----------------------------------------
+2. Virtualbox
+-----------------------------------------
 
-Direct Installation Notes Without Conda
-----------------------------------------
+
+-----------------------------------------
+3. Direct Installation Notes 
+-----------------------------------------
 
 1) Prerequisite: Python and python-dev packages (Can use apt-get install on Ubuntu).
 
