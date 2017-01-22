@@ -21,7 +21,8 @@ def _(stl, x, t):
     right = float(right)  
     if left>right:
         raise ValueError("Interval [{},{}] empty for {}".format(left, right, stl))
-    return all(qualitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    (maxtime, rangetime) = gettime(x, left, right)
+    return all(qualitativescore(stl.subformula, x, min(t+t1, maxtime)) for t1 in rangetime)
 
 
 @qualitativescore.register(Future)
@@ -31,7 +32,8 @@ def _(stl, x, t):
     right = float(right) 
     if left>right:
         raise ValueError("Interval [{},{}] empty for {}".format(left, right, stl))    
-    return any(qualitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    (maxtime, rangetime) = gettime(x, left, right)
+    return any(qualitativescore(stl.subformula, x, min(t+t1, maxtime)) for t1 in rangetime)
 
 
 @qualitativescore.register(Or)
@@ -92,13 +94,14 @@ def quantitativescore(stl, x, t):
 @quantitativescore.register(Globally)
 def _(stl, x, t):
     (left, right) = stl.interval
-    #(right - left + 1)
-    return  min(quantitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    (maxtime, rangetime) = gettime(x, left, right)
+    return  min(quantitativescore(stl.subformula, x, min(t+t1, maxtime)) for t1 in rangetime)
 
 @quantitativescore.register(Future)
 def _(stl, x, t):
     (left, right) = stl.interval
-    return max(quantitativescore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    (maxtime, rangetime) = gettime(x, left, right)
+    return max(quantitativescore(stl.subformula, x, min(t+t1, maxtime)) for t1 in rangetime)
 
 
 @quantitativescore.register(Or)
@@ -145,13 +148,16 @@ def smartscore(stl, x, t):
 def _(stl, x, t):
     (left, right) = stl.interval
     intervalwidth = right - left + 1
-    return  2/(1 + math.exp(-0.01 * intervalwidth) ) * min(smartscore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    (maxtime, rangetime) = gettime(x, left, right)
+    #rangetime =  x[(x['time'] <= right) & (x['time'] >= left)]["time"]
+    return  2/(1 + math.exp(-0.01 * intervalwidth) ) * min(smartscore(stl.subformula, x, min(t+t1, maxtime)) for t1 in rangetime)
 
 @smartscore.register(Future)
 def _(stl, x, t):
     (left, right) = stl.interval
     intervalwidth = right - left + 1
-    return  2/(1 + math.exp(0.01 * intervalwidth) ) * max(smartscore(stl.subformula, x, min(t+t1, x.index[-1])) for t1 in x[(x.index <= right) & (x.index >= left)].index)
+    (maxtime, rangetime) = gettime(x, left, right)
+    return  2/(1 + math.exp(0.01 * intervalwidth) ) * max(smartscore(stl.subformula, x, min(t+t1, maxtime)) for t1 in rangetime)
 
 
 @smartscore.register(Or)
@@ -193,3 +199,9 @@ def _(stl, x, t):
 
 
 
+
+def gettime(x, left, right):
+    ts = sorted(x['time'].keys())
+    maxtime = ts[-1]
+    rangetime = filter(lambda v: (v<= right) & (v >= left), ts)
+    return maxtime, rangetime
