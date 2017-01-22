@@ -61,34 +61,51 @@ def main(argv):
 
     runtime = {}
     rhovalues = {}
+    doneflag = {}
 
     for templ in templogicdata:
         runtime[templ] = []
         rhovalues[templ] = []
+        doneflag[templ] = False
 
-    for i in range(0,itercount):
-        for templ in templogicdata:
+    for templ in templogicdata:
+        for i in range(0,itercount):
             stlsyn, value, dur = test_stl(templ, optmethod)
             runtime[templ].append(dur)
             rhovalues[templ].append(value)
             f1=open(logfile, 'a')
             f1.write("Finished {} (Iter: {}) in {} seconds with value {} and result {}\n".format(templ, i, dur , value, stlsyn))
             f1.close()
+            f1=open(logfile, 'a')
+        doneflag[templ] = True
+        f1.write("========================SO-FAR========================================\n")
+        f1.write("               Optmethod {}\n".format(optmethod))
+        f1.write("======================================================================\n")
+        f1.write("                Averaging over {} Iterations\n".format(itercount))
+        f1.write("======================================================================\n")
+        template = "{0:5}|{1:10}|{2:25}|{3:25}|{4:20}|{5:20}\n" 
+        f1.write(template.format("ID", " #Params", "     Mean Runtime", "     Variance in Runtime", "  Rho Mean ", " Rho Var ") )
+        for templ1 in filter(lambda x: doneflag[x], templogicdata):
+            f1.write("----------------------------------------------------------------------\n")
+            f1.write(template.format(i, 2*i, numpy.mean(runtime[templ1]), numpy.var(runtime[templ1]), numpy.mean(rhovalues[templ1]), numpy.var(rhovalues[templ1]) ))
+            i = i+1
+        f1.write("======================================================================\n")
+        f1.close()
+
 
     f1=open(logfile, 'a')
-    f1.write("======================================================================\n")
+    f1.write("========================FINAL=========================================\n")
     f1.write("               Optmethod {}\n".format(optmethod))
     f1.write("======================================================================\n")
     f1.write("                Averaging over {} Iterations\n".format(itercount))
     f1.write("======================================================================\n")
     template = "{0:5}|{1:10}|{2:25}|{3:25}|{4:20}|{5:20}\n" 
     f1.write(template.format("ID", " #Params", "     Mean Runtime", "     Variance in Runtime", "  Rho Mean ", " Rho Var ") )
-    f1.write("----------------------------------------------------------------------\n")
     i = 1
     for templ in templogicdata:
+        f1.write("----------------------------------------------------------------------\n")
         f1.write(template.format(i, 2*i, numpy.mean(runtime[templ]), numpy.var(runtime[templ]), numpy.mean(rhovalues[templ]), numpy.var(rhovalues[templ]) ))
         i = i+1
-        f1.write("----------------------------------------------------------------------\n")
     f1.write("======================================================================\n")
     f1.close()
 
