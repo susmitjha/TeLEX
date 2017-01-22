@@ -58,7 +58,7 @@ def minscoretracelist(stl, paramvalue, tracelist, scorerfun):
 
 
 
-def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID'):
+def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID', tol = 1e-1):
     prmlist = parametrizer.getParams(stl)
     prmcount = len(prmlist)
     lb = np.zeros((prmcount,))
@@ -73,17 +73,18 @@ def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID'):
     attempts = 0
     initguess = map(uniform_tuple, boundlist)
     bestCost = 0
+    options={'gtol': tol, 'disp': False}
     while not done and attempts < 10:
         attempts = attempts + 1
         if optmethod == 'HYBRID':
             if attempts % 2 == 0:
-                res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method='L-BFGS-B')
+                res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method='L-BFGS-B',options=options)
             else:
-                res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method='TNC')
+                res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method='TNC',options=options)
         elif optmethod == 'DE':
-            res = scipy.optimize.differential_evolution(costfunc, bounds = boundlist)
+            res = scipy.optimize.differential_evolution(costfunc, bounds = boundlist, tol = tol)
         else:
-            res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method=optmethod)
+            res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method=optmethod,options=options)
 
         logging.debug("Attempt : {} with Cost: {}/{} Param: {}".format(attempts, res.fun, bestCost, res.x))
         if res.fun > 1.01* bestCost and res.fun < 0.99 * bestCost:
@@ -284,7 +285,7 @@ def postProcess(stlex, pvalue, dirparams, tracelist):
     
 
 
-def synthSTLParam(tlStr, tracedir, optmethod = 'DE'):
+def synthSTLParam(tlStr, tracedir, optmethod = 'DE', tol = 1e-1):
     stlex = stl.parse(tlStr)
     param = parametrizer.getParams(stlex)
     logging.debug("\nTo Synthesize STL Template: {}".format(stlex))
@@ -297,7 +298,7 @@ def synthSTLParam(tlStr, tracedir, optmethod = 'DE'):
     #stlsyn = synth.bayesoptimize(stlex, [x,x1], 50, 1, 2, "discrete", steps = 10)
     #stlsyn, value, dur = synth.bayesoptimize(stlex, [x,x1], 100, 1, 2, "continuous")
 
-    pvalue, value, dur = simoptimize(stlex, tracelist, optmethod = optmethod)
+    pvalue, value, dur = simoptimize(stlex, tracelist, optmethod = optmethod, tol = tol)
     dirparams = parametrizer.getParamsDir(stlex, 0)
     #print(dirparams)
     ppvalue = postProcess(stlex, pvalue, dirparams, tracelist) 
@@ -306,7 +307,7 @@ def synthSTLParam(tlStr, tracedir, optmethod = 'DE'):
 
     logging.debug("Synthesized STL: {}".format(stlsyn))
     logging.debug("Synthesis: Cost is {}, Time taken is {}".format(value, dur))
-    return stlsyn, value, dur
+    return stlsyn, -1*value, dur #we were minimizing negative of theta
 
 
 def verifySTL(stlex, tracedir):
