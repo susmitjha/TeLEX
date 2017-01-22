@@ -2,6 +2,7 @@ import pytest
 import telex.synth
 import pandas
 import numpy
+import sys, getopt
 
 #templogicdata =  'G[0,6] F[b? 1;6,  a? 4;6](x1 > 2)'
 templogicdata =  [
@@ -32,6 +33,8 @@ def test_stl(tlStr):
 
 
 def main():
+    try opts,args = getopt.getopt(argv
+    
     runtime = {}
     rhovalues = []
 
