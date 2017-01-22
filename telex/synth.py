@@ -76,6 +76,12 @@ def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID', to
     options={'gtol': tol, 'disp': False}
     while not done and attempts < 10:
         attempts = attempts + 1
+        if optmethod == "nogradient":
+            res = scipy.optimize.differential_evolution(costfunc, bounds = boundlist, tol = tol)
+        else:
+            res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,options=options)
+
+        '''
         if optmethod == 'HYBRID':
             if attempts % 2 == 0:
                 res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method='L-BFGS-B',options=options)
@@ -85,6 +91,7 @@ def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID', to
             res = scipy.optimize.differential_evolution(costfunc, bounds = boundlist, tol = tol)
         else:
             res = scipy.optimize.minimize(costfunc, initguess, bounds=boundlist,method=optmethod,options=options)
+        '''
 
         logging.debug("Attempt : {} with Cost: {}/{} Param: {}".format(attempts, res.fun, bestCost, res.x))
         if res.fun > 1.01* bestCost and res.fun < 0.99 * bestCost:
@@ -289,10 +296,6 @@ def synthSTLParam(tlStr, tracedir, optmethod="gradient", tol = 1e-1):
     stlex = stl.parse(tlStr)
     param = parametrizer.getParams(stlex)
     logging.debug("\nTo Synthesize STL Template: {}".format(stlex))
-    if optmethod == "nogradient":
-        optmethod = 'DE'
-    else:
-        optmethod = 'L-BFGS-B'
     tracenamelist = find_filenames (tracedir, suffix=".csv")
     tracelist = []
     for tracename in tracenamelist:
