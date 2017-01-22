@@ -6,6 +6,7 @@ import pandas
 import numpy
 import sys, getopt
 
+
 #templogicdata =  'G[0,6] F[b? 1;6,  a? 4;6](x1 > 2)'
 templogicdata =  [
     'G[0,1](x <= a? 0;12 & x >= b? -12;0 )',
@@ -31,12 +32,14 @@ def test_stl(tlStr, optmethod = "gradient"):
     print(" Synthesized STL formula: {}\n Theta Optimal Value: {}\n Optimization time: {}\n".format(stlsyn, value, dur))
     (bres, qres) = telex.synth.verifySTL(stlsyn, "scale")
     print(" Test result of synthesized STL on each trace: {}\n Robustness Metric Value: {}\n".format(bres, qres))
-    return value,dur
+    return stlsyn,value,dur
 
 
 def main(argv):
     itercount = 2
     optmethod = "gradient"
+    
+    
     try: 
         opts,args = getopt.getopt(argv, "hi:o:",["itercount=","optmethod="])
     except getopt.GetoptError:
@@ -52,6 +55,10 @@ def main(argv):
         elif opt in ("-o", "--optmethod"):
             optmethod = arg
 
+    logfile = "scale_" + optmethod + "_" + str(itercount) + ".log"
+    print("Writing to logfile: {}".format(logfile))
+
+
     runtime = {}
     rhovalues = {}
 
@@ -61,24 +68,30 @@ def main(argv):
 
     for i in range(0,itercount):
         for templ in templogicdata:
-            value, dur = test_stl(templ, optmethod)
+            stlsyn, value, dur = test_stl(templ, optmethod)
             runtime[templ].append(dur)
             rhovalues[templ].append(value)
+            f1=open(logfile, 'a')
+            f1.write("Finished {} (Iter: {}) in {} seconds with value {} and result {}\n".format(templ, i, dur , value, stlsyn))
+            f1.close()
 
-    print("======================================================================")
-    print("               Optmethod {}".format(optmethod))
-    print("======================================================================")
-    print("                Averaging over {} Iterations".format(itercount))
-    print("======================================================================")
-    template = "{0:5}|{1:10}|{2:25}|{3:25}|{4:20}|{5:20}" 
-    print template.format("ID", " #Params", "     Mean Runtime", "     Variance in Runtime", "  Rho Mean ", " Rho Var ")
-    print("----------------------------------------------------------------------")
+    f1=open(logfile, 'a')
+    f1.write("======================================================================\n")
+    f1.write("               Optmethod {}\n".format(optmethod))
+    f1.write("======================================================================\n")
+    f1.write("                Averaging over {} Iterations\n".format(itercount))
+    f1.write("======================================================================\n")
+    template = "{0:5}|{1:10}|{2:25}|{3:25}|{4:20}|{5:20}\n" 
+    f1.write(template.format("ID", " #Params", "     Mean Runtime", "     Variance in Runtime", "  Rho Mean ", " Rho Var ") )
+    f1.write("----------------------------------------------------------------------\n")
     i = 1
     for templ in templogicdata:
-        print(template.format(i, 2*i, numpy.mean(runtime[templ]), numpy.var(runtime[templ]), numpy.mean(rhovalues[templ]), numpy.var(rhovalues[templ]) ))
+        f1.write(template.format(i, 2*i, numpy.mean(runtime[templ]), numpy.var(runtime[templ]), numpy.mean(rhovalues[templ]), numpy.var(rhovalues[templ]) ))
         i = i+1
-        print("----------------------------------------------------------------------")
-    print("======================================================================")
+        f1.write("----------------------------------------------------------------------\n")
+    f1.write("======================================================================\n")
+    f1.close()
+
     #print("Mean Robustness Value: {}, Variance: {}".format(numpy.mean(rhovalues), numpy.var(rhovalues) ) )
 
 
