@@ -285,11 +285,14 @@ def postProcess(stlex, pvalue, dirparams, tracelist):
     
 
 
-def synthSTLParam(tlStr, tracedir, optmethod = 'DE', tol = 1e-1):
+def synthSTLParam(tlStr, tracedir, optmethod="gradient", tol = 1e-1):
     stlex = stl.parse(tlStr)
     param = parametrizer.getParams(stlex)
     logging.debug("\nTo Synthesize STL Template: {}".format(stlex))
-   
+    if optmethod == "nogradient":
+        optmethod = 'DE'
+    else:
+        optmethod = 'L-BFGS-B'
     tracenamelist = find_filenames (tracedir, suffix=".csv")
     tracelist = []
     for tracename in tracenamelist:
@@ -305,6 +308,7 @@ def synthSTLParam(tlStr, tracedir, optmethod = 'DE', tol = 1e-1):
     #print(pvalue, ppvalue)
     stlsyn = parametrizer.setParams(stlex, ppvalue)
 
+    logging.debug("Opt method used: {}".format(optmethod))
     logging.debug("Synthesized STL: {}".format(stlsyn))
     logging.debug("Synthesis: Cost is {}, Time taken is {}".format(value, dur))
     return stlsyn, -1*value, dur #we were minimizing negative of theta
