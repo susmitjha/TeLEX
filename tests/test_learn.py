@@ -17,9 +17,14 @@ templogicdata =  [
 def test_stl(tlStr):
     print(tlStr)
     (stlsyn, value, dur) = telex.synth.synthSTLParam(tlStr, "traces")
-    print(stlsyn, value, dur)
+    print(" Synthesized STL formula: {}\n Theta Optimal Value: {}\n Optimization time: {}\n".format(stlsyn, value, dur))
     (bres, qres) = telex.synth.verifySTL(stlsyn, "traces")
-    print(bres, qres)
+    print(" Test result of synthesized STL on each trace: {}\n Robustness Metric Value: {}\n".format(bres, qres))
+#    print(tlStr)
+#    (stlsyn, value, dur) = telex.synth.synthSTLParam(tlStr, "traces")
+#    print(stlsyn, value, dur)
+#    (bres, qres) = telex.synth.verifySTL(stlsyn, "traces")
+#    print(bres, qres)
 
 
 def main():
