@@ -45,16 +45,16 @@ def main():
             rhovalues.append(value)
 
 
-    print("============================================================")
-    template = "{0:5}|{1:25}|{2:25}" 
-    print template.format("ID", "     Mean Runtime", "     Variance in Runtime")
-    print("------------------------------------------------------------")
+    print("======================================================================")
+    template = "{0:5}|{1:10}|{2:25}|{3:25}" 
+    print template.format("ID", " #Params", "     Mean Runtime", "     Variance in Runtime")
+    print("----------------------------------------------------------------------")
     i = 1
     for templ in templogicdata:
-        print(template.format(i, numpy.mean(runtime[templ]), numpy.var(runtime[templ])))
+        print(template.format(i, 2*i, numpy.mean(runtime[templ]), numpy.var(runtime[templ])))
         i = i+1
-        print("------------------------------------------------------------")
-    print("============================================================")
+        print("----------------------------------------------------------------------")
+    print("======================================================================")
     print("Mean Robustness Value: {}, Variance: {}".format(numpy.mean(rhovalues), numpy.var(rhovalues) ) )
 
 
