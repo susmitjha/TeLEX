@@ -85,10 +85,11 @@ def main(argv):
         f1.write("======================================================================\n")
         template = "{0:5}|{1:10}|{2:25}|{3:25}|{4:20}|{5:20}\n" 
         f1.write(template.format("ID", " #Params", "     Mean Runtime", "     Variance in Runtime", "  Rho Mean ", " Rho Var ") )
+        j = 1
         for templ1 in filter(lambda x: doneflag[x], templogicdata):
             f1.write("----------------------------------------------------------------------\n")
-            f1.write(template.format(i, 2*i, numpy.mean(runtime[templ1]), numpy.var(runtime[templ1]), numpy.mean(rhovalues[templ1]), numpy.var(rhovalues[templ1]) ))
-            i = i+1
+            f1.write(template.format(j, 2*j, numpy.mean(runtime[templ1]), numpy.var(runtime[templ1]), numpy.mean(rhovalues[templ1]), numpy.var(rhovalues[templ1]) ))
+            j = j+1
         f1.write("======================================================================\n")
         f1.close()
 
