@@ -86,3 +86,33 @@ To fix:
 --------
 
 a) code assumes deterministic enumeration over lists in communicating with optimizer; this is probably not the case in python 3 or is likely to be removed soon for security issues. 
+
+
+========================================================
+Template Grammar
+========================================================
+
+formula = ( _ globally _) / ( _ future _ ) / ( _ until _ ) / ( _ expr _ ) / ( _ paren_formula _)
+paren_formula = "(" _ formula _ ")"
+globally = "G" interval formula
+future = "F" interval formula
+until = "U" interval "(" formula "," formula ")" 
+interval = _ "[" _ bound  _ "," _ bound _ "]" _
+expr = or / and / implies / npred / pred 
+or = "(" _ formula _ "|" _ formula _ ")"
+and = "(" _ formula _ "&" _ formula _ ")"
+implies = "(" _ formula _ "->" _ formula _ ")"
+npred = "!" _ formula 
+pred = constraint / atom 
+constraint =  term _ relop _ bound _
+term = infix / var
+infix = "{" _ term _ arithop _  term _ "}"
+var = _ id _
+atom = _ id _
+bound = param / num 
+param =  id "?" _ num ";" num _ 
+id = ~r"[a-zA-z\d]+"
+num = ~r"[\+\-]?\d*(\.\d+)?"
+relop = ">=" / "<=" / "<" / ">" / "=="
+arithop = "+" / "-" / "*" / "/"
+_ = ~r"\s"*
