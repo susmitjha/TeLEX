@@ -33,7 +33,7 @@ def test_stl(tlStr, optmethod = "gradient"):
     (bres, qres) = telex.synth.verifySTL(stlsyn, "scale")
     print(" Test result of synthesized STL on each trace: {}\n Robustness Metric Value: {}\n".format(bres, qres))
     return stlsyn,value,dur
-
+ 
 
 def main(argv):
     itercount = 2
