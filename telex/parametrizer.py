@@ -5,6 +5,8 @@ def getParamsDir(stl, dir):
         return list(set().union(getParamsDir(stl.interval, 1), getParamsDir(stl.subformula, 0) ) )
     elif isinstance(stl, Future):
         return list(set().union(getParamsDir(stl.interval, -1), getParamsDir(stl.subformula, 0) ) )
+    elif isinstance(stl, Until): #expanding until op as well
+        return list(set().union(getParamsDir(stl.interval, 1), getParamsDir(stl.left, 0), getParamsDir(stl.right, 0) ) )
     elif isinstance(stl, Interval):
         #For intervals
         #dir 1 means, expand as much as possible
@@ -43,6 +45,8 @@ def getParamsDir(stl, dir):
 def getParams(stl):
     if isinstance(stl, (Globally, Future)):
         return list(set().union(getParams(stl.interval), getParams(stl.subformula)))
+    if isinstance(stl, Until):
+        return list(set().union(getParams(stl.interval), getParams(stl.left), getParams(stl.right)))
     elif isinstance(stl, (Interval, Or, And, Implies, Expr)):
         return list(set().union(getParams(stl.left), getParams(stl.right)))
     elif isinstance(stl,Not):
@@ -63,6 +67,8 @@ def getParams(stl):
 def setParams(stl,valuemap):
     if isinstance(stl, (Globally, Future)):
         return eval(type(stl).__name__)(setParams(stl.interval, valuemap),setParams(stl.subformula, valuemap) )
+    if isinstance(stl, Until):
+        return eval(type(stl).__name__)(setParams(stl.interval, valuemap),setParams(stl.left, valuemap),setParams(stl.right, valuemap) )
     elif isinstance(stl, (Interval, Or, And, Implies)):
         return eval(type(stl).__name__)(setParams(stl.left,valuemap),setParams(stl.right, valuemap))
     elif isinstance(stl, Expr):
