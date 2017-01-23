@@ -91,7 +91,7 @@ a) code assumes deterministic enumeration over lists in communicating with optim
 ========================================================
 Template Grammar
 ========================================================
-''' python
+``` python
 formula = ( _ globally _) / ( _ future _ ) / ( _ until _ ) / ( _ expr _ ) / ( _ paren_formula _)
 paren_formula = "(" _ formula _ ")"
 globally = "G" interval formula
@@ -116,4 +116,4 @@ num = ~r"[\+\-]?\d*(\.\d+)?"
 relop = ">=" / "<=" / "<" / ">" / "=="
 arithop = "+" / "-" / "*" / "/"
 _ = ~r"\s"*
-'''
+```
