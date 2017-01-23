@@ -72,6 +72,7 @@ def simoptimize(stl, tracelist,scorefun=scorer.smartscore,optmethod='HYBRID', to
     done = False
     attempts = 0
     initguess = map(uniform_tuple, boundlist)
+    logging.debug("Initial guess in simoptimize : {} ".format(initguess))
     bestCost = 0
     options={'gtol': tol, 'disp': False}
     while not done and attempts < 10:
