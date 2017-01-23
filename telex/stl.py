@@ -5,10 +5,11 @@ from collections import namedtuple
 #templogicdata =  'G[0,2] F[b? 3;3,  a? 4;4](x1 > 2)' works but templogicdata =  'G[0,2]F[b? 3;3,  a? 4;4](x1 > 2)' does not
     
 grammar_text = (r''' 
-formula = ( _ globally _) / ( _ future _ ) / ( _ expr _ ) / ( _ paren_formula _)
+formula = ( _ globally _) / ( _ future _ ) / ( _ until _ ) / ( _ expr _ ) / ( _ paren_formula _)
 paren_formula = "(" _ formula _ ")"
 globally = "G" interval formula
 future = "F" interval formula
+until = "U" interval "(" formula "," formula ")" 
 interval = _ "[" _ bound  _ "," _ bound _ "]" _
 expr = or / and / implies / npred / pred 
 or = "(" _ formula _ "|" _ formula _ ")"
@@ -47,6 +48,10 @@ class TLVisitor(NodeVisitor):
     def visit_future(self, node, children):
         _, interval, formula = children
         return Future(interval, formula)
+
+    def visit_until(self, node, children):
+        _, interval, _, formula1, _, formula2, _ = children
+        return Until(interval, formula1, formula2)
 
     def visit_interval(self, node, children):
         _, _, _, left, _, _, _, right, _, _, _  = children
@@ -126,6 +131,13 @@ class Future(namedtuple('F',['interval','subformula'])):
     def __repr__(self):
         return "F{}{}".format(self.interval, self.subformula)
 
+class Until(namedtuple('U',['interval','left', 'right'])):
+    def children(self):
+        return [self.left, self,right]
+    def __repr__(self):
+        return "U{}{}{}".format(self.interval, self.left, self.right)
+
+
 class Interval(namedtuple("Interval", ['left','right'])):
     def __repr__(self):
         return "[{},{}]".format(self.left, self.right)
@@ -176,7 +188,7 @@ class Var(namedtuple("Var", ["name"])):
 
 class Param(namedtuple("Param", ["name", "left", "right"])):
     def __repr__(self):
-        return "{}?[{},{}]".format(self.name, self.left, self.right)
+        return "{}? {};{} ".format(self.name, self.left, self.right)
 
 class Constant(float):
     pass
