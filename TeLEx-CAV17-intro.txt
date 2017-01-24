@@ -1,4 +1,18 @@
-Spec of Machine Used for Experiments
+------------------------------------
+Executive Summary Instructions
+To Run Experiments in Draft
+With the VM Image.
+
+Boot up and open a terminal.
+
+Activate conda environment named telex
+> source activate telex
+> cd /home/telex/TeLEX/tests
+> 
+-------------------------------------
+
+
+Spec of Host Machine Used for Experiments
 ------------------------------------
 
 CPU model name  : Intel(R) Core(TM) i5-2450M CPU @ 2.50GHz
@@ -14,7 +28,7 @@ Spec of Virtual Box
 
 Virtual Box: Oracle VM VirtualBox Manager Version 5.1.14 r112924
 Create Virtual Machine: 
-Name - telexVM, Type - Linux, Version - Ubuntu (64-bit)
+Name - telexVM, Type - Linux, Version - Ubuntu 
 Memory - 1GB
 VirtualBox Disk Image (dynamically allocated) of size 8 GB
 Hard Disk File type: VDI
@@ -22,6 +36,33 @@ Disk Image Used: ubuntu-14.04.5-desktop-i386.iso
 
 Username: telex
 Password: telex
+
+uname -a on Virtual Machine
+Linux telex-VirtualBox 4.4.0-31-generic #50~14.04.1-Ubuntu
+
+Setting Up Python and Conda
+----------------------------------
+Downloaded Conda for 32 bit Ubuntu Linux from https://docs.continuum.io/anaconda/install#linux-install: Anaconda2-4.2.0-Linux-x86_64.sh
+
+Install it by running.
+> bash Anaconda2-4.2.0-Linux-x86_64.sh
+Installed to /home/telex/anaconda2
+Added it to path in ~/.bashrc
+
+Installed emacs 
+
+Added sources to ~/TeLEX
+
+Python 2.7 comes preinstalled with Ubuntu 14.04
+
+
+TeLEx Installation
+-----------------------------------
+> conda env create -f telex.yml
+This will install all dependencies.
+Fetched a bunch of packages listed in yml file.
+
+Added ~/TeLEX to PYTHONPATH in .bashrc
 
 TeLEx Tool Distribution
 -----------------------------------
