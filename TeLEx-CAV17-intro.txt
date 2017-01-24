@@ -8,9 +8,32 @@ Boot up and open a terminal.
 Activate conda environment named telex
 > source activate telex
 > cd /home/telex/TeLEX/tests
-> 
--------------------------------------
+> ./runallgradientonly.sh
+If you look inside sh script, it is calling
+python test_scale.py -i 10 -o gradient
+that is, run test_scale.py with iterations set to 10
+and choice of optimizer set to gradient.
+This will run all 12 STL learning problems (10 times each)
+and keep reporting the results to the screen as well as summary
+results to scale_gradient_10.log file.
+The summaries in scale_gradient_10.log have intermediate tables
+after each set of 10 repetitions. synth.log has logging from
+the tool.
 
+Look at log files in /home/telex/TeLEX/tests/scale-results/run-gradient/
+for what to expect. 
+
+Similarly, do
+> ./runall.sh 
+to run both gradient and non-gradient optimizers.
+Note that non-gradient is very slow as reported in the
+draft. Its results are also cached in 
+/home/telex/TeLEX/tests/scale-results/run-nogradient/
+
+--------------------------------------------------------
+
+Detailed  Instructions9
+--------------------------------------------------------
 
 Spec of Host Machine Used for Experiments
 ------------------------------------
@@ -64,6 +87,8 @@ Fetched a bunch of packages listed in yml file.
 
 Added ~/TeLEX to PYTHONPATH in .bashrc
 
+
+
 TeLEx Tool Distribution
 -----------------------------------
 Location in VB image:
@@ -95,15 +120,47 @@ Structure:
 Guideline for reproducing results in submission
 -------------------------------------------------
 
-Detailed experiment logs showing each of $12$ learnt STL properties in 
-10 iterations and 
-%scripts to reproduce these results 
-%are included in the tool distribution at $\mathtt{tests/scale}$
-%directory with instructions to run them in $\mathtt{README}$. 
-%ther test-cases can also be found in $\mathtt{tests}$ directory.
+Boot up and open a terminal.
 
-%The examples in $\mathtt{test}$ directory of
-%the tool distribution further illustrate
-%how STL can be used. The tool distribution also includes conda~\cite{conda} 
-%environment file (telex.yml) 
-%to make dependency installation and environment-setup convenient. 
+Activate conda environment named telex
+> source activate telex
+> cd /home/telex/TeLEX/tests
+> ./runallgradientonly.sh
+If you look inside sh script, it is calling
+python test_scale.py -i 10 -o gradient
+that is, run test_scale.py with iterations set to 10
+and choice of optimizer set to gradient.
+This will run all 12 STL learning problems (10 times each)
+and keep reporting the results to the screen as well as summary
+results to scale_gradient_10.log file.
+The summaries in scale_gradient_10.log have intermediate tables
+after each set of 10 repetitions. synth.log has logging from
+the tool.
+
+Look at log files in /home/telex/TeLEX/tests/scale-results/run-gradient/
+for what to expect. 
+
+Similarly, do
+> ./runall.sh 
+to run both gradient and non-gradient optimizers.
+Note that non-gradient is very slow as reported in the
+draft. Its results are also cached in 
+/home/telex/TeLEX/tests/scale-results/run-nogradient/
+
+The other test_*.py examples in tests directory of
+the tool distribution further illustrate
+how TeLEX can be used. 
+
+If you want to go one level under the hood,
+look at python test_scale.py -i 10 -o gradient
+which recieved two inputs: number of iterations for
+each testcase and the optimization method which can be
+gradient or nogradient.
+In the python file, you will see how STL templates
+are provided along with trace directory, and then
+call is made to the main learning function in synth.py:
+telex.synth.synthSTLParam 
+This is the function described in Tool Architecture 
+section of the draft. 
+ 
+Hope you have fun playing with the tool! 
