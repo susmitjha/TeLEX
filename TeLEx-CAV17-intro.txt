@@ -1,0 +1,68 @@
+Spec of Machine Used for Experiments
+------------------------------------
+
+CPU model name  : Intel(R) Core(TM) i5-2450M CPU @ 2.50GHz
+cache size      : 3072 KB
+siblings        : 4
+MemTotal        : 3989704 kB
+
+>uname -a
+Linux sjlinux1 3.16.0-77-generic #99~14.04.1-Ubuntu SMP Tue Jun 28 19:17:10 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+
+Spec of Virtual Box
+------------------------------------
+
+Virtual Box: Oracle VM VirtualBox Manager Version 5.1.14 r112924
+Create Virtual Machine: 
+Name - telexVM, Type - Linux, Version - Ubuntu (64-bit)
+Memory - 1GB
+VirtualBox Disk Image (dynamically allocated) of size 8 GB
+Hard Disk File type: VDI
+Disk Image Used: ubuntu-14.04.5-desktop-i386.iso
+
+Username: telex
+Password: telex
+
+TeLEx Tool Distribution
+-----------------------------------
+Location in VB image:
+
+Structure:
+.
+├── README.md  [Contains instructions for installation and usage]
+├── setup.py   [ Python package installation file ]
+├── telex      [ Source Directory]
+│   ├── __init__.py     [Package init ]
+│   ├── inputreader.py  [Used to read csv trace files]
+│   ├── parametrizer.py [Used to manipulate parameters in STL template]
+│   ├── scorer.py       [Used to compute score under various metrics]
+│   ├── stl.py          [STL module]
+│   └── synth.py        [Learner module using numerical optimization]
+├── telex.yml   [Conda installation config]        
+└── tests       [Test Directory]
+    ├── runallgradientonly.sh   [shell script to run gradient-based learning]
+    ├── runall.sh               [shell script to regenerate all experiments in submitted draft]
+    ├── scale			[directory with the xSin(x*x) trace]
+    ├── scale-results		[all results from experiments reported in submitted draft]
+    ├── test_learn.py		[script for some additional tests with various STL templates]
+    ├── test_metriccalc.py
+    ├── test_robustcalc.py
+    ├── test_scale.py		[python script used in experiments in submitted draft; shell script calls this]
+    └── traces			[directory with small traces used in test_learn.py]
+
+
+Guideline for reproducing results in submission
+-------------------------------------------------
+
+Detailed experiment logs showing each of $12$ learnt STL properties in 
+10 iterations and 
+%scripts to reproduce these results 
+%are included in the tool distribution at $\mathtt{tests/scale}$
+%directory with instructions to run them in $\mathtt{README}$. 
+%ther test-cases can also be found in $\mathtt{tests}$ directory.
+
+%The examples in $\mathtt{test}$ directory of
+%the tool distribution further illustrate
+%how STL can be used. The tool distribution also includes conda~\cite{conda} 
+%environment file (telex.yml) 
+%to make dependency installation and environment-setup convenient. 
