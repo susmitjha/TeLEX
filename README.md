@@ -86,3 +86,47 @@ To fix:
 --------
 
 a) code assumes deterministic enumeration over lists in communicating with optimizer; this is probably not the case in python 3 or is likely to be removed soon for security issues. 
+
+
+========================================================
+Template Grammar
+========================================================
+``` 
+formula = ( _ globally _) / ( _ future _ ) / ( _ until _ ) / ( _ expr _ ) / ( _ paren_formula _)
+paren_formula = "(" _ formula _ ")"
+globally = "G" interval formula
+future = "F" interval formula
+until = "U" interval "(" formula "," formula ")" 
+interval = _ "[" _ bound  _ "," _ bound _ "]" _
+expr = or / and / implies / npred / pred 
+or = "(" _ formula _ "|" _ formula _ ")"
+and = "(" _ formula _ "&" _ formula _ ")"
+implies = "(" _ formula _ "->" _ formula _ ")"
+npred = "!" _ formula 
+pred = constraint / atom 
+constraint =  term _ relop _ bound _
+term = infix / var
+infix = "{" _ term _ arithop _  term _ "}"
+var = _ id _
+atom = _ id _
+bound = param / num 
+param =  id "?" _ num ";" num _ 
+id = ~r"[a-zA-z\d]+"
+num = ~r"[\+\-]?\d*(\.\d+)?"
+relop = ">=" / "<=" / "<" / ">" / "=="
+arithop = "+" / "-" / "*" / "/"
+_ = ~r"\s"*
+```
+
+Examples:
+
+```
+    'G[b? 1;6,  a? 1;9](x1 > 2)',
+    'G[0,5] F[a? 0;3, b? 0;5] (x1 > 2)',
+    'G[0,5] F[1, b? 0;5] (x1 > 2)',
+    'G[0,5] F[a? 0;2 , 2] (x1 > 2)',
+    'G[0,5] F[a? 1;2 , 3] (x1 > 2)',
+    'G[0,9] ({ x1 - x2 } < a? -2;8 )',
+    'G[0,9] ({ x2 - x1 } < a? -2;8 )',
+    'U[0,a? 0;2] (x1 <= 10, x2<=5)'
+```
