@@ -1,38 +1,36 @@
 ------------------------------------
-Executive Summary Instructions
-To Run Experiments in Draft
-With the VM Image.
+Executive Summary Instructions To Run Experiments in Draft With the VM Image.
 
-Boot up and open a terminal.
+Boot up and open a terminal. Follow these three steps:
 
+STEP 1:
 Activate conda environment named telex
 > source activate telex
-> cd /home/telex/TeLEX/tests
-> ./runallgradientonly.sh
-If you look inside sh script, it is calling
-python test_scale.py -i 10 -o gradient
-that is, run test_scale.py with iterations set to 10
-and choice of optimizer set to gradient.
-This will run all 12 STL learning problems (10 times each)
-and keep reporting the results to the screen as well as summary
-results to scale_gradient_10.log file.
-The summaries in scale_gradient_10.log have intermediate tables
-after each set of 10 repetitions. synth.log has logging from
-the tool.
 
-Look at log files in /home/telex/TeLEX/tests/scale-results/run-gradient/
-for what to expect. 
+STEP 2:
+Go to the tests folder
+> cd /home/telex/TeLEX/tests
+
+STEP 3:
+Execute sh script and wait for results to incrementally keep getting logged in  scale_gradient_10.log  
+> ./runallgradientonly.sh
+
+Don't worry if you get some warning about attempting to remove log file that is not present.
+
+If you look inside runallgradientonly.sh script, it is calling
+"python test_scale.py -i 10 -o gradient"
+that is, run test_scale.py with iterations set to 10 and choice of optimizer set to gradient. This will run all 12 STL learning problems (10 times each) and keep reporting the results to the screen as well as summary (mean and standard deviation) results to scale_gradient_10.log file. The summaries in scale_gradient_10.log have intermediate tables after each set of 10 repetitions. synth.log has logging from the tool.
+
+Look at log files in /home/telex/TeLEX/tests/scale-results/run-gradient/ for what to expect. 
 
 Similarly, do
 > ./runall.sh 
-to run both gradient and non-gradient optimizers.
-Note that non-gradient is very slow as reported in the
-draft. Its results are also cached in 
+to run both gradient and non-gradient optimizers. Note that non-gradient is very slow as reported in the draft. Its results are also cached in 
 /home/telex/TeLEX/tests/scale-results/run-nogradient/
 
 --------------------------------------------------------
 
-Detailed  Instructions9
+Detailed  Instructions and Information
 --------------------------------------------------------
 
 Spec of Host Machine Used for Experiments
@@ -124,7 +122,11 @@ Boot up and open a terminal.
 
 Activate conda environment named telex
 > source activate telex
+
+Go to the tests folder
 > cd /home/telex/TeLEX/tests
+
+Run the high-level script
 > ./runallgradientonly.sh
 If you look inside sh script, it is calling
 python test_scale.py -i 10 -o gradient
